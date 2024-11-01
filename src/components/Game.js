@@ -1,55 +1,72 @@
-// components/Game.js
+// pages/game/[slug].js
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import io from "socket.io-client";
 
-export default function Game() {
-  const [gameState, setGameState] = useState(null);
-  const [playerId, setPlayerId] = useState(
-    `player-${Math.random().toString(36).substr(2, 5)}`
-  );
+let socket;
+
+export default function GameRoom() {
+  const router = useRouter();
+  const { slug } = router.query;
+  const [playerName, setPlayerName] = useState("");
+  const [isConnected, setIsConnected] = useState(false);
+  const [players, setPlayers] = useState([]);
+  const [diceResult, setDiceResult] = useState(null);
 
   useEffect(() => {
-    // Spieler registrieren
-    fetch("/api/game", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ playerId }),
-    })
-      .then((response) => response.json())
-      .then((data) => setGameState(data.gameState));
-  }, [playerId]);
+    if (!slug) return;
 
-  const rollDice = () => {
-    fetch("/api/game", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ playerId }),
-    })
-      .then((response) => response.json())
-      .then((data) => setGameState(data.gameState));
+    // Socket-Initialisierung
+    socket = io();
+
+    // Verbindung zum Raum
+    socket.emit("joinRoom", slug);
+
+    socket.on("playerJoined", ({ playerId }) => {
+      setPlayers((prev) => [...prev, playerId]);
+    });
+
+    socket.on("diceRolled", ({ playerId, diceResult }) => {
+      setDiceResult({ playerId, result: diceResult });
+    });
+
+    setIsConnected(true);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [slug]);
+
+  const handleRollDice = () => {
+    socket.emit("rollDice", slug);
   };
-
-  if (!gameState) return <p>Lädt...</p>;
 
   return (
     <div>
-      <h1>Würfelspiel</h1>
-      <p>Du bist: {playerId}</p>
-      <p>Aktueller Spieler: {gameState.currentPlayer}</p>
-      <p>Letzter Wurf: {gameState.lastRoll}</p>
-      <button
-        onClick={rollDice}
-        disabled={gameState.currentPlayer !== playerId}
-      >
-        Würfeln
-      </button>
-      <h2>Punktestand:</h2>
-      <ul>
-        {Object.entries(gameState.players).map(([id, score]) => (
-          <li key={id}>
-            {id}: {score} Punkte
-          </li>
-        ))}
-      </ul>
+      <h1>Raum: {slug}</h1>
+      <input
+        type="text"
+        placeholder="Dein Name"
+        value={playerName}
+        onChange={(e) => setPlayerName(e.target.value)}
+      />
+      {isConnected && (
+        <>
+          <button onClick={handleRollDice}>Würfeln</button>
+          {diceResult && (
+            <p>
+              Spieler {diceResult.playerId} hat eine {diceResult.result}{" "}
+              geworfen!
+            </p>
+          )}
+          <h2>Spieler im Raum:</h2>
+          <ul>
+            {players.map((player) => (
+              <li key={player}>{player}</li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }
