@@ -3,15 +3,13 @@ import { useState, useEffect } from "react";
 export default function LocalSession() {
   const initDices = [null, null, null, null, null];
   const [initRollState, setInitRollState] = useState(false);
-
   const [currentDices, setCurrentDices] = useState(initDices);
   const [dicesToRender, setDicesToRender] = useState(currentDices);
-
   const [pashValue, setPashValue] = useState(0);
   const [pashNumber, setPashNumber] = useState(0);
-
   const [oneCounter, setOneCounter] = useState(0);
   const [fiveCounter, setFiveCounter] = useState(0);
+  const [currentPoints, setCurrentPoints] = useState(0);
 
   function calculateDice() {
     return Math.floor(Math.random() * 6) + 1;
@@ -22,15 +20,17 @@ export default function LocalSession() {
       ? currentDices.map(() => calculateDice())
       : initDices.map(() => calculateDice());
 
-    setOneCounter(0);
-    setFiveCounter(0);
     setCurrentDices(newDices);
     setDicesToRender(newDices);
     setInitRollState(true);
 
+    setOneCounter(0);
+    setFiveCounter(0);
+    setPashValue(0);
+    setPashNumber(0);
+
     const updatedDicesAfterPash = checkPaschAndRemove(newDices);
     setCurrentDices(updatedDicesAfterPash);
-
     const updatedDicesAfterOneAndFive = checkOneAndFive(updatedDicesAfterPash);
     setCurrentDices(updatedDicesAfterOneAndFive);
   }
@@ -74,21 +74,37 @@ export default function LocalSession() {
 
       if (foundPasch) break;
     }
-
-    if (!foundPasch) {
-      setPashNumber(0);
-      setPashValue(0);
-    }
-
     return newDices;
   }
 
+  // POINT CALCULATION
+  useEffect(() => {
+    if (oneCounter > 0) {
+      setCurrentPoints((prevPoints) => prevPoints + 100 * oneCounter);
+    }
+    if (fiveCounter > 0) {
+      setCurrentPoints((prevPoints) => prevPoints + 50 * fiveCounter);
+    }
+    if (pashNumber > 0) {
+      let newPoints = 0;
+      if (pashValue === 1) {
+        if (pashNumber === 3) newPoints = 1000;
+        else if (pashNumber === 4) newPoints = 10000;
+        else if (pashNumber === 5) newPoints = 100000;
+      } else {
+        if (pashNumber === 3) newPoints = pashValue * 100;
+        else if (pashNumber === 4) newPoints = pashValue * 1000;
+        else if (pashNumber === 5) newPoints = pashValue * 10000;
+      }
+      setCurrentPoints((prevPoints) => prevPoints + newPoints);
+    }
+  }, [pashValue, pashNumber, oneCounter, fiveCounter]);
+
+  //DEBUG
   useEffect(() => {
     console.log("CURRENT DICES", currentDices);
-    console.log("PASH", pashValue, pashNumber);
-    console.log("Anzahl der 1er:", oneCounter);
-    console.log("Anzahl der 5er:", fiveCounter);
-  }, [currentDices, pashValue, pashNumber, oneCounter, fiveCounter]);
+    console.log("CURRENT POINTS", currentPoints);
+  }, [currentDices, currentPoints]);
 
   return (
     <>
@@ -98,6 +114,7 @@ export default function LocalSession() {
         <div key={index}>{dice}</div>
       ))}
       <button onClick={rollDices}>ROLL</button>
+      <h3>YOUR POINTS: {currentPoints}</h3>
     </>
   );
 }
