@@ -19,10 +19,9 @@ export default function LocalSession() {
     const newDices = initRollState
       ? currentDices.map(() => calculateDice())
       : initDices.map(() => calculateDice());
-
+    setInitRollState(true);
     setCurrentDices(newDices);
     setDicesToRender(newDices);
-    setInitRollState(true);
 
     setOneCounter(0);
     setFiveCounter(0);
