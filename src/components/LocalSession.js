@@ -10,7 +10,7 @@ export default function LocalSession() {
   const [oneCounter, setOneCounter] = useState(0);
   const [fiveCounter, setFiveCounter] = useState(0);
   const [currentPoints, setCurrentPoints] = useState(0);
-  let diceCounter = 0;
+  const [diceCounter, setDiceCounter] = useState(0);
 
   const [actualPlayers, setActualPlayers] = useState([]);
   const [currentPlayer, setCurrentPlayer] = useState({});
@@ -34,7 +34,7 @@ export default function LocalSession() {
     setInitRollState(true);
     setCurrentDices(newDices);
     setDicesToRender(newDices);
-    diceCounter = currentDices.length;
+    setDiceCounter(currentDices.length);
     setOneCounter(0);
     setFiveCounter(0);
     setPashValue(0);
@@ -45,7 +45,7 @@ export default function LocalSession() {
     const updatedDicesAfterOneAndFive = checkOneAndFive(updatedDicesAfterPash);
     setCurrentDices(updatedDicesAfterOneAndFive);
 
-    checkGotPoints();
+    //checkGotPoints();
   }
 
   function checkOneAndFive(dicesToCheck) {
@@ -93,7 +93,7 @@ export default function LocalSession() {
   function checkGotPoints() {
     if (diceCounter === currentDices.length) {
       setCurrentPoints(0);
-      setCurrentPlayerIndex((prevIndex) => prevIndex + 1);
+      setRoundCounter((prev) => prev + 1);
     }
   }
 
@@ -123,6 +123,8 @@ export default function LocalSession() {
   //DEBUG
   useEffect(() => {
     console.log("CURRENT PLAYER INDEX", currentPlayerIndex);
+    console.log("CURRENT PLAYER", currentPlayer);
+    console.log("CURRENT POINTS", currentPoints);
   }, [currentDices, currentPoints]);
 
   function addPlayer(event) {
@@ -150,18 +152,43 @@ export default function LocalSession() {
     setCurrentPlayer(actualPlayers[currentPlayerIndex]);
   }, [currentPlayerIndex, actualPlayers]);
 
+  //RESET POINTS AND INCREASE ROUND
+  useEffect(() => {
+    if (diceCounter === currentDices.length) {
+      setCurrentPoints(0);
+      setCurrentPlayerIndex((prevIndex) => prevIndex + 1);
+      setInitRollState(false);
+    }
+  }, [currentDices]);
+
+  function takePointsAndPassTurn() {
+    const updatedPlayers = actualPlayers.map((player) => {
+      if (player.name === currentPlayer.name) {
+        return { ...player, points: player.points + currentPoints };
+      }
+      return player;
+    });
+    setActualPlayers(updatedPlayers);
+    setCurrentPlayerIndex((prevIndex) => prevIndex + 1);
+    setCurrentPoints(0);
+    setInitRollState(false);
+  }
+
   return (
     <>
       <h1>GAME</h1>
 
       {initGame ? (
         <>
-          {<h3>YOUR TURN: {currentPlayer.name}</h3>}
+          {currentPlayer && <h3>YOUR TURN: {currentPlayer.name}</h3>}
           <h3>CURRENT ROLL</h3>
           {dicesToRender.map((dice, index) => (
             <div key={index}>{dice}</div>
           ))}
           <button onClick={rollDices}>ROLL</button>
+          <button onClick={takePointsAndPassTurn}>
+            TAKE POINTS AND PASS TURN
+          </button>
           <h3>YOUR POINTS: {currentPoints}</h3>
         </>
       ) : null}
