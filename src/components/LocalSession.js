@@ -210,6 +210,17 @@ export default function LocalSession() {
   const [isAddPlayerMenuOpen, setIsAddPlayerMenuOpen] = useState(false);
   const [isLostPopupOpen, setIsLostPopupOpen] = useState(false);
 
+  function addPlayer(event) {
+    event.preventDefault();
+    const playerName = event.target.playerName.value;
+    const newPlayer = { ...playerObject, name: playerName };
+    setActualPlayers((prevPlayers) => [...prevPlayers, newPlayer]);
+    event.target.reset();
+
+    if (actualPlayers.length === 1) {
+      setInitGame(true);
+    }
+  }
   function toggleAddPlayerMenu() {
     setIsAddPlayerMenuOpen(!isAddPlayerMenuOpen);
   }
@@ -284,6 +295,36 @@ export default function LocalSession() {
     return newDices;
   }
 
+  function takePointsAndPassTurn() {
+    const updatedPlayers = actualPlayers.map((player) => {
+      if (player.name === currentPlayer.name) {
+        return { ...player, points: player.points + currentPoints };
+      }
+      return player;
+    });
+    setActualPlayers(updatedPlayers);
+    setCurrentPlayerIndex((prevIndex) => prevIndex + 1);
+    setInitRollState(false);
+    setDiceCounter(0);
+    setCurrentPoints(0);
+    setCurrentDices(initDices);
+  }
+
+  function resetGame() {
+    setCurrentPoints(0);
+    setCurrentPlayerIndex(null);
+    setCurrentPlayer({});
+    setActualPlayers([]);
+    setInitRollState(false);
+    setOneCounter(0);
+    setFiveCounter(0);
+    setPashValue(0);
+    setPashNumber(0);
+    setDiceCounter(0);
+    setInitGame(false);
+    setDicesToRender(initDices);
+  }
+
   // POINT CALCULATION
   useEffect(() => {
     if (oneCounter > 0) {
@@ -306,28 +347,6 @@ export default function LocalSession() {
       setCurrentPoints((prevPoints) => prevPoints + newPoints);
     }
   }, [pashValue, pashNumber, oneCounter, fiveCounter]);
-
-  //DEBUG
-  useEffect(() => {
-    console.log("--------------------------");
-    console.log("diceCounter", diceCounter);
-    console.log("currentDices", currentDices);
-    console.log("initState", initRollState);
-    console.log("--------------------------");
-    console.log("diceToRender", dicesToRender);
-  }, []);
-
-  function addPlayer(event) {
-    event.preventDefault();
-    const playerName = event.target.playerName.value;
-    const newPlayer = { ...playerObject, name: playerName };
-    setActualPlayers((prevPlayers) => [...prevPlayers, newPlayer]);
-    event.target.reset();
-
-    if (actualPlayers.length === 1) {
-      setInitGame(true);
-    }
-  }
 
   //INIT GAME
   useEffect(() => {
@@ -363,35 +382,15 @@ export default function LocalSession() {
     }
   }, [dicesToRender]);
 
-  function takePointsAndPassTurn() {
-    const updatedPlayers = actualPlayers.map((player) => {
-      if (player.name === currentPlayer.name) {
-        return { ...player, points: player.points + currentPoints };
-      }
-      return player;
-    });
-    setActualPlayers(updatedPlayers);
-    setCurrentPlayerIndex((prevIndex) => prevIndex + 1);
-    setInitRollState(false);
-    setDiceCounter(0);
-    setCurrentPoints(0);
-    setCurrentDices(initDices);
-  }
-
-  function resetGame() {
-    setCurrentPoints(0);
-    setCurrentPlayerIndex(null);
-    setCurrentPlayer({});
-    setActualPlayers([]);
-    setInitRollState(false);
-    setOneCounter(0);
-    setFiveCounter(0);
-    setPashValue(0);
-    setPashNumber(0);
-    setDiceCounter(0);
-    setInitGame(false);
-    setDicesToRender(initDices);
-  }
+  //DEBUG
+  useEffect(() => {
+    console.log("--------------------------");
+    console.log("diceCounter", diceCounter);
+    console.log("currentDices", currentDices);
+    console.log("initState", initRollState);
+    console.log("--------------------------");
+    console.log("diceToRender", dicesToRender);
+  }, [dicesToRender]);
 
   return (
     <>
