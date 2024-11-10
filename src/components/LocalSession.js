@@ -12,6 +12,7 @@ export default function LocalSession() {
   const [fiveCounter, setFiveCounter] = useState(0);
   const [diceCounter, setDiceCounter] = useState(0);
 
+  //SAVED
   const [currentPoints, setCurrentPoints] = useLocalStorage("currentPoints", 0);
   const [actualPlayers, setActualPlayers] = useLocalStorage(
     "actualPlayers",
