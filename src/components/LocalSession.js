@@ -1,17 +1,186 @@
 import { useState, useEffect } from "react";
 import useLocalStorage from "use-local-storage";
+import Dice from "./Dice";
+import styled from "styled-components";
+
+const StyledWaitingWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+`;
+
+const StyledPlayerMenu = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background-color: white;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  padding: 20px;
+  width: 70vw;
+  height: 30vh;
+`;
+
+const StyledLostPopup = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background-color: white;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  padding: 20px;
+  width: 70vw;
+  height: 30vh;
+`;
+
+const StyledBackdrop = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  z-index: 9;
+`;
+const StyledButton = styled.button`
+  border: black 2px solid;
+  border-radius: 10px;
+  color: black;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 4px 2px;
+  width: 150px;
+`;
+
+const StyledPlayerForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StyledInput = styled.input`
+  width: 150px;
+  border: black 2px solid;
+  border-radius: 10px;
+`;
+
+const StyledFooter = styled.footer`
+  position: fixed;
+  background-color: white;
+  bottom: 0;
+  width: 100%;
+  height: 7vh;
+  text-align: center;
+  padding: 10px;
+  border-top: 2px solid black;
+  margin: 0;
+  padding: 0;
+  padding-top: 20px;
+  padding-bottom: 20px;
+`;
+
+const StyledHeader = styled.header`
+  position: sticky;
+  background-color: white;
+  top: 0;
+  width: 100%;
+  height: 7vh;
+  text-align: center;
+  padding: 10px;
+  border-bottom: 2px solid black;
+  margin: 0;
+  padding: 0;
+  padding-top: 20px;
+  padding-bottom: 20px;
+`;
+
+const StyledDiceContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 20px;
+`;
+
+const StyledButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-evenly;
+  margin: 20px;
+`;
+
+const StyledPointsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+`;
+
+const StyledLeaderboardContainerWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StyledLeaderboardContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  height: 20vh;
+  width: 80vw;
+  overflow-y: auto;
+`;
+
+const StyledPlayerContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: center;
+  margin: 5px;
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  width: 80%;
+  height: 5vh;
+`;
+
+const StyledLeaderboardH3 = styled.h3`
+  margin-bottom: 0;
+`;
 
 export default function LocalSession() {
   const initDices = [null, null, null, null, null];
-  const [initRollState, setInitRollState] = useState(false);
-  const [currentDices, setCurrentDices] = useState(initDices);
-  const [dicesToRender, setDicesToRender] = useState(currentDices);
   const [pashValue, setPashValue] = useState(0);
   const [pashNumber, setPashNumber] = useState(0);
   const [oneCounter, setOneCounter] = useState(0);
   const [fiveCounter, setFiveCounter] = useState(0);
-  const [diceCounter, setDiceCounter] = useState(0);
 
+  //SAVED
   const [currentPoints, setCurrentPoints] = useLocalStorage("currentPoints", 0);
   const [actualPlayers, setActualPlayers] = useLocalStorage(
     "actualPlayers",
@@ -25,13 +194,47 @@ export default function LocalSession() {
     "cuurentPlayerIndex",
     null
   );
-
   const playerObject = {
     name: "",
     points: 0,
   };
-
   const [initGame, setInitGame] = useLocalStorage("initGame", false);
+  const [initRollState, setInitRollState] = useLocalStorage(
+    "initRollState",
+    false
+  );
+  const [currentDices, setCurrentDices] = useLocalStorage(
+    "currentDices",
+    initDices
+  );
+  const [dicesToRender, setDicesToRender] = useLocalStorage(
+    "DicesToRender",
+    currentDices
+  );
+  const [diceCounter, setDiceCounter] = useLocalStorage("diceCounter", 0);
+
+  //MENU
+  const [isAddPlayerMenuOpen, setIsAddPlayerMenuOpen] = useState(false);
+  const [isLostPopupOpen, setIsLostPopupOpen] = useState(false);
+
+  function addPlayer(event) {
+    event.preventDefault();
+    const playerName = event.target.playerName.value;
+    const newPlayer = { ...playerObject, name: playerName };
+    setActualPlayers((prevPlayers) => [...prevPlayers, newPlayer]);
+    event.target.reset();
+
+    if (actualPlayers.length === 1) {
+      setInitGame(true);
+    }
+  }
+  function toggleAddPlayerMenu() {
+    setIsAddPlayerMenuOpen(!isAddPlayerMenuOpen);
+  }
+
+  function toggleLostPopup() {
+    setIsLostPopupOpen(!isLostPopupOpen);
+  }
 
   function calculateDice() {
     return Math.floor(Math.random() * 6) + 1;
@@ -41,10 +244,11 @@ export default function LocalSession() {
     const newDices = initRollState
       ? currentDices.map(() => calculateDice())
       : initDices.map(() => calculateDice());
+    setDiceCounter(currentDices.length);
     setInitRollState(true);
     setCurrentDices(newDices);
     setDicesToRender(newDices);
-    setDiceCounter(currentDices.length);
+
     setOneCounter(0);
     setFiveCounter(0);
     setPashValue(0);
@@ -54,8 +258,6 @@ export default function LocalSession() {
     setCurrentDices(updatedDicesAfterPash);
     const updatedDicesAfterOneAndFive = checkOneAndFive(updatedDicesAfterPash);
     setCurrentDices(updatedDicesAfterOneAndFive);
-
-    //checkGotPoints();
   }
 
   function checkOneAndFive(dicesToCheck) {
@@ -100,11 +302,34 @@ export default function LocalSession() {
     return newDices;
   }
 
-  function checkGotPoints() {
-    if (diceCounter === currentDices.length) {
-      setCurrentPoints(0);
-      setRoundCounter((prev) => prev + 1);
-    }
+  function takePointsAndPassTurn() {
+    const updatedPlayers = actualPlayers.map((player) => {
+      if (player.name === currentPlayer.name) {
+        return { ...player, points: player.points + currentPoints };
+      }
+      return player;
+    });
+    setActualPlayers(updatedPlayers);
+    setCurrentPlayerIndex((prevIndex) => prevIndex + 1);
+    setInitRollState(false);
+    setDiceCounter(0);
+    setCurrentPoints(0);
+    setCurrentDices(initDices);
+  }
+
+  function resetGame() {
+    setCurrentPoints(0);
+    setCurrentPlayerIndex(null);
+    setCurrentPlayer({});
+    setActualPlayers([]);
+    setInitRollState(false);
+    setOneCounter(0);
+    setFiveCounter(0);
+    setPashValue(0);
+    setPashNumber(0);
+    setDiceCounter(0);
+    setInitGame(false);
+    setDicesToRender(initDices);
   }
 
   // POINT CALCULATION
@@ -130,25 +355,6 @@ export default function LocalSession() {
     }
   }, [pashValue, pashNumber, oneCounter, fiveCounter]);
 
-  //DEBUG
-  useEffect(() => {
-    console.log("CURRENT PLAYER INDEX", currentPlayerIndex);
-    console.log("CURRENT PLAYER", currentPlayer);
-    console.log("CURRENT POINTS", currentPoints);
-  }, [currentDices, currentPoints]);
-
-  function addPlayer(event) {
-    event.preventDefault();
-    const playerName = event.target.playerName.value;
-    const newPlayer = { ...playerObject, name: playerName };
-    setActualPlayers((prevPlayers) => [...prevPlayers, newPlayer]);
-    event.target.reset();
-
-    if (actualPlayers.length === 1) {
-      setInitGame(true);
-    }
-  }
-
   //INIT GAME
   useEffect(() => {
     setCurrentPlayerIndex(0);
@@ -162,75 +368,106 @@ export default function LocalSession() {
     setCurrentPlayer(actualPlayers[currentPlayerIndex]);
   }, [currentPlayerIndex, actualPlayers]);
 
-  //RESET POINTS AND INCREASE ROUND
+  //CHECK GOT POINTS AND HANDLE ROUND
   useEffect(() => {
-    if (diceCounter === currentDices.length) {
+    if (diceCounter === 0) {
+      setInitRollState(false);
+      setCurrentDices(initDices);
+    }
+
+    if (
+      diceCounter === currentDices.length &&
+      currentDices.length > 0 &&
+      currentDices[0] !== null
+    ) {
+      setInitRollState(false);
+      setCurrentDices(initDices);
+      setDiceCounter(0);
       setCurrentPoints(0);
       setCurrentPlayerIndex((prevIndex) => prevIndex + 1);
-      setInitRollState(false);
+      toggleLostPopup();
     }
-  }, [currentDices]);
+  }, [dicesToRender]);
 
-  function takePointsAndPassTurn() {
-    const updatedPlayers = actualPlayers.map((player) => {
-      if (player.name === currentPlayer.name) {
-        return { ...player, points: player.points + currentPoints };
-      }
-      return player;
-    });
-    setActualPlayers(updatedPlayers);
-    setCurrentPlayerIndex((prevIndex) => prevIndex + 1);
-    setCurrentPoints(0);
-    setInitRollState(false);
-  }
-
-  function resetGame() {
-    setCurrentPoints(0);
-    setCurrentPlayerIndex(null);
-    setCurrentPlayer({});
-    setActualPlayers([]);
-    setInitRollState(false);
-    setOneCounter(0);
-    setFiveCounter(0);
-    setPashValue(0);
-    setPashNumber(0);
-    setDiceCounter(0);
-    setInitGame(false);
-  }
+  //DEBUG
+  useEffect(() => {
+    console.log("--------------------------");
+    console.log("diceCounter", diceCounter);
+    console.log("currentDices", currentDices);
+    console.log("initState", initRollState);
+    console.log("--------------------------");
+    console.log("diceToRender", dicesToRender);
+  }, [dicesToRender]);
 
   return (
     <>
-      <h1>GAME</h1>
-
+      {!initGame ? (
+        <StyledWaitingWrapper>
+          <h3>WAITING FOR PLAYERS...</h3>
+        </StyledWaitingWrapper>
+      ) : null}
       {initGame ? (
         <>
-          {currentPlayer && <h3>YOUR TURN: {currentPlayer.name}</h3>}
-          <h3>CURRENT ROLL</h3>
-          {dicesToRender.map((dice, index) => (
-            <div key={index}>{dice}</div>
-          ))}
-          <button onClick={rollDices}>ROLL</button>
-          <button onClick={takePointsAndPassTurn}>
-            TAKE POINTS AND PASS TURN
-          </button>
-          <h3>YOUR POINTS: {currentPoints}</h3>
+          <StyledHeader>
+            {currentPlayer && <h3>YOUR TURN: {currentPlayer.name}</h3>}
+          </StyledHeader>
+          <StyledDiceContainer>
+            {dicesToRender.map((dice, index) => (
+              <Dice key={index} number={dice} />
+            ))}
+          </StyledDiceContainer>
+          <StyledPointsContainer>
+            <h3>YOUR POINTS: {currentPoints}</h3>
+          </StyledPointsContainer>
+
+          <StyledButtonContainer>
+            <StyledButton onClick={rollDices}>ROLL</StyledButton>
+            <StyledButton onClick={takePointsAndPassTurn}>PASS</StyledButton>
+          </StyledButtonContainer>
+          <StyledLeaderboardContainerWrapper>
+            <StyledLeaderboardH3>LEADERBOARD</StyledLeaderboardH3>
+            <StyledLeaderboardContainer>
+              {actualPlayers.map((player) => (
+                <StyledPlayerContainer key={player.name}>
+                  <h3>
+                    {player.name}: {player.points}
+                  </h3>
+                </StyledPlayerContainer>
+              ))}
+            </StyledLeaderboardContainer>
+          </StyledLeaderboardContainerWrapper>
         </>
       ) : null}
-      {actualPlayers.map((player) => (
-        <div key={player.name}>
-          <h3>{player.name}</h3>
-          <p>Points: {player.points}</p>
-        </div>
-      ))}
-      <br />
-      <br />
-      <h3>Add Player</h3>
-      <form onSubmit={addPlayer}>
-        <label htmlFor="playerName">Player Name:</label>
-        <input type="text" id="playerName" name="playerName" />
-        <button type="submit">Add Player</button>
-      </form>
-      <button onClick={resetGame}>RESET GAME</button>
+
+      {/*PLAYER MENU*/}
+      {isAddPlayerMenuOpen && (
+        <>
+          <StyledBackdrop onClick={toggleAddPlayerMenu} />
+          <StyledPlayerMenu>
+            <h3>Name</h3>
+            <StyledPlayerForm onSubmit={addPlayer}>
+              <StyledInput type="text" id="playerName" name="playerName" />
+              <br />
+              <StyledButton type="submit">Add Player</StyledButton>
+            </StyledPlayerForm>
+          </StyledPlayerMenu>
+        </>
+      )}
+
+      {/*LOST POPUP*/}
+      {isLostPopupOpen && (
+        <>
+          <StyledBackdrop onClick={toggleLostPopup} />
+          <StyledLostPopup onClick={toggleLostPopup}>
+            <h3>YOU LOST</h3>
+          </StyledLostPopup>
+        </>
+      )}
+
+      <StyledFooter>
+        <StyledButton onClick={resetGame}>RESET</StyledButton>
+        <StyledButton onClick={toggleAddPlayerMenu}>PLAYER</StyledButton>
+      </StyledFooter>
     </>
   );
 }
