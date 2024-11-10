@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import useLocalStorage from "use-local-storage";
 
 export default function LocalSession() {
   const initDices = [null, null, null, null, null];
@@ -9,19 +10,28 @@ export default function LocalSession() {
   const [pashNumber, setPashNumber] = useState(0);
   const [oneCounter, setOneCounter] = useState(0);
   const [fiveCounter, setFiveCounter] = useState(0);
-  const [currentPoints, setCurrentPoints] = useState(0);
   const [diceCounter, setDiceCounter] = useState(0);
 
-  const [actualPlayers, setActualPlayers] = useState([]);
-  const [currentPlayer, setCurrentPlayer] = useState({});
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(null);
+  const [currentPoints, setCurrentPoints] = useLocalStorage("currentPoints", 0);
+  const [actualPlayers, setActualPlayers] = useLocalStorage(
+    "actualPlayers",
+    []
+  );
+  const [currentPlayer, setCurrentPlayer] = useLocalStorage(
+    "currentPlayer",
+    {}
+  );
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useLocalStorage(
+    "cuurentPlayerIndex",
+    null
+  );
 
   const playerObject = {
     name: "",
     points: 0,
   };
 
-  const [initGame, setInitGame] = useState(false);
+  const [initGame, setInitGame] = useLocalStorage("initGame", false);
 
   function calculateDice() {
     return Math.floor(Math.random() * 6) + 1;
@@ -174,6 +184,20 @@ export default function LocalSession() {
     setInitRollState(false);
   }
 
+  function resetGame() {
+    setCurrentPoints(0);
+    setCurrentPlayerIndex(null);
+    setCurrentPlayer({});
+    setActualPlayers([]);
+    setInitRollState(false);
+    setOneCounter(0);
+    setFiveCounter(0);
+    setPashValue(0);
+    setPashNumber(0);
+    setDiceCounter(0);
+    setInitGame(false);
+  }
+
   return (
     <>
       <h1>GAME</h1>
@@ -206,6 +230,7 @@ export default function LocalSession() {
         <input type="text" id="playerName" name="playerName" />
         <button type="submit">Add Player</button>
       </form>
+      <button onClick={resetGame}>RESET GAME</button>
     </>
   );
 }

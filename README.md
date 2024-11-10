@@ -6,18 +6,24 @@ This project is a web-based implementation of the classic dice game known as 100
 
 ## Features
 
-- **Multiplayer Support**: Play with friends by entering a unique game room.
 - **Player Identification**: Enter player names for easy identification during gameplay.
 - **Scoring System**: Points are awarded for specific combinations of dice rolls (e.g., triples, singles).
 - **Real-time Updates**: The game updates scores and displays remaining dice dynamically.
 - **User-Friendly Interface**: A clean and intuitive interface for a seamless gaming experience.
 
+## Work in Progress
+
+- **Multiplayer Support**: Play with friends by entering a unique game room.
+
 ## Getting Started
 
-### Prerequisites
+### Technologies
 
-- Node.js (version 12 or later)
-- npm (Node package manager)
+- JavaScript/HTML/CSS
+- React
+- Next.js
+- Styled Components
+- use-local-storage
 
 ### Installation
 
