@@ -3,6 +3,14 @@ import useLocalStorage from "use-local-storage";
 import Dice from "./Dice";
 import styled from "styled-components";
 
+const StyledWaitingWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+`;
+
 const StyledPlayerMenu = styled.div`
   display: flex;
   flex-direction: column;
@@ -49,14 +57,6 @@ const StyledBackdrop = styled.div`
   backdrop-filter: blur(8px);
   z-index: 9;
 `;
-
-const StyledPlayerForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
-
 const StyledButton = styled.button`
   border: black 2px solid;
   border-radius: 10px;
@@ -67,6 +67,13 @@ const StyledButton = styled.button`
   font-size: 16px;
   margin: 4px 2px;
   width: 150px;
+`;
+
+const StyledPlayerForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 const StyledInput = styled.input`
@@ -108,7 +115,7 @@ const StyledHeader = styled.header`
 const StyledDiceContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
   margin: 20px;
 `;
@@ -394,6 +401,11 @@ export default function LocalSession() {
 
   return (
     <>
+      {!initGame ? (
+        <StyledWaitingWrapper>
+          <h3>WAITING FOR PLAYERS...</h3>
+        </StyledWaitingWrapper>
+      ) : null}
       {initGame ? (
         <>
           <StyledHeader>
