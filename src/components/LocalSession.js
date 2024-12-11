@@ -3,6 +3,8 @@ import useLocalStorage from "use-local-storage";
 import Dice from "./Dice";
 import styled from "styled-components";
 
+//STYLING
+
 const StyledWaitingWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -217,6 +219,7 @@ export default function LocalSession() {
   const [isAddPlayerMenuOpen, setIsAddPlayerMenuOpen] = useState(false);
   const [isLostPopupOpen, setIsLostPopupOpen] = useState(false);
 
+  //FUNCTIONS
   function addPlayer(event) {
     event.preventDefault();
     const playerName = event.target.playerName.value;
