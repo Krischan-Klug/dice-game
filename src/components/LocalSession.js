@@ -357,7 +357,9 @@ export default function LocalSession() {
 
   //INIT GAME
   useEffect(() => {
-    setCurrentPlayerIndex(0);
+    if (!initGame) {
+      setCurrentPlayerIndex(0);
+    }
   }, [initGame]);
 
   //NEXT PLAYER CYCLE
