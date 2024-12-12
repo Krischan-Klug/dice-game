@@ -51,7 +51,6 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setDiceValues(diceValues.map(() => getRandomNumber()));
-      console.log("refreshed");
     }, 1500);
 
     return () => clearInterval(interval);
