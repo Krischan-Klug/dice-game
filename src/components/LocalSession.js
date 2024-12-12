@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import useLocalStorage from "use-local-storage";
 import Dice from "./Dice";
 import styled from "styled-components";
+import DefaultButton from "./DefaultButton";
+
+//STYLING
 
 const StyledWaitingWrapper = styled.div`
   display: flex;
@@ -56,17 +59,6 @@ const StyledBackdrop = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(8px);
   z-index: 9;
-`;
-const StyledButton = styled.button`
-  border: black 2px solid;
-  border-radius: 10px;
-  color: black;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  font-size: 16px;
-  margin: 4px 2px;
-  width: 150px;
 `;
 
 const StyledPlayerForm = styled.form`
@@ -217,6 +209,7 @@ export default function LocalSession() {
   const [isAddPlayerMenuOpen, setIsAddPlayerMenuOpen] = useState(false);
   const [isLostPopupOpen, setIsLostPopupOpen] = useState(false);
 
+  //FUNCTIONS
   function addPlayer(event) {
     event.preventDefault();
     const playerName = event.target.playerName.value;
@@ -391,16 +384,6 @@ export default function LocalSession() {
     }
   }, [dicesToRender]);
 
-  //DEBUG
-  useEffect(() => {
-    console.log("--------------------------");
-    console.log("diceCounter", diceCounter);
-    console.log("currentDices", currentDices);
-    console.log("initState", initRollState);
-    console.log("--------------------------");
-    console.log("diceToRender", dicesToRender);
-  }, [dicesToRender]);
-
   return (
     <>
       {!initGame ? (
@@ -423,8 +406,8 @@ export default function LocalSession() {
           </StyledPointsContainer>
 
           <StyledButtonContainer>
-            <StyledButton onClick={rollDices}>ROLL</StyledButton>
-            <StyledButton onClick={takePointsAndPassTurn}>PASS</StyledButton>
+            <DefaultButton text="ROLL" onClick={rollDices} />
+            <DefaultButton text="PASS" onClick={takePointsAndPassTurn} />
           </StyledButtonContainer>
           <StyledLeaderboardContainerWrapper>
             <StyledLeaderboardH3>LEADERBOARD</StyledLeaderboardH3>
@@ -450,7 +433,7 @@ export default function LocalSession() {
             <StyledPlayerForm onSubmit={addPlayer}>
               <StyledInput type="text" id="playerName" name="playerName" />
               <br />
-              <StyledButton type="submit">Add Player</StyledButton>
+              <DefaultButton text="ADD PLAYER" type="submit" />
             </StyledPlayerForm>
           </StyledPlayerMenu>
         </>
@@ -467,8 +450,8 @@ export default function LocalSession() {
       )}
 
       <StyledFooter>
-        <StyledButton onClick={resetGame}>RESET</StyledButton>
-        <StyledButton onClick={toggleAddPlayerMenu}>PLAYER</StyledButton>
+        <DefaultButton text="RESET" onClick={resetGame} />
+        <DefaultButton text="PLAYER" onClick={toggleAddPlayerMenu} />
       </StyledFooter>
     </>
   );

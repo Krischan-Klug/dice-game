@@ -1,4 +1,19 @@
-body,
+@font-face {
+  font-family: "SFPRO";
+  src: url("/fonts/SFPRODISPLAYREGULAR.OTF") format("opentype");
+  font-weight: 400; /* Regular */
+}
+
+body {
+  font-family: "SFPRO", sans-serif;
+}
+
+button,
+input,
+textarea {
+  font-family: "SFPRO", sans-serif;
+}
+
 html {
   margin: 0;
   padding: 0;
