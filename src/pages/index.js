@@ -38,7 +38,9 @@ export default function Home() {
   const router = useRouter();
 
   const [diceValues, setDiceValues] = useState(
-    Array(10).fill(getRandomNumber())
+    Array(10)
+      .fill(0)
+      .map(() => getRandomNumber())
   );
 
   function getRandomNumber() {
