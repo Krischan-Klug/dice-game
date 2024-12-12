@@ -394,16 +394,6 @@ export default function LocalSession() {
     }
   }, [dicesToRender]);
 
-  //DEBUG
-  useEffect(() => {
-    console.log("--------------------------");
-    console.log("diceCounter", diceCounter);
-    console.log("currentDices", currentDices);
-    console.log("initState", initRollState);
-    console.log("--------------------------");
-    console.log("diceToRender", dicesToRender);
-  }, [dicesToRender]);
-
   return (
     <>
       {!initGame ? (
