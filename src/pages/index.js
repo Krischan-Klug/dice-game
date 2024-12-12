@@ -36,39 +36,48 @@ const StyledDiceContainer = styled.div`
 
 export default function Home() {
   const router = useRouter();
-  const [diceNumbers, setDiceNumbers] = useState([1, 2, 3, 4, 5]);
+
+  const [diceValues, setDiceValues] = useState(
+    Array(10).fill(getRandomNumber())
+  );
+
+  function getRandomNumber() {
+    return Math.floor(Math.random() * 6) + 1;
+  }
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setDiceNumbers(diceNumbers.map(() => Math.floor(Math.random() * 6) + 1));
-    }, 5000);
+      setDiceValues(diceValues.map(() => getRandomNumber()));
+      console.log("refreshed");
+    }, 1500);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [diceValues]);
 
   return (
     <StyledContentWrapper>
       <StyledDiceContainer>
-        {diceNumbers.slice(2).map((num, index) => (
-          <Dice key={index + 2} number={num} />
+        {diceValues.slice(0, 2).map((value, index) => (
+          <Dice key={index} number={value} />
         ))}
       </StyledDiceContainer>
       <StyledDiceContainer>
-        {diceNumbers.slice(0, 2).map((num, index) => (
-          <Dice key={index} number={num} />
+        {diceValues.slice(2, 5).map((value, index) => (
+          <Dice key={index} number={value} />
         ))}
       </StyledDiceContainer>
 
       <h1>10000 (Farkle)</h1>
       <StyledButton onClick={() => router.push("/local")}>LOCAL</StyledButton>
+      <br />
       <StyledDiceContainer>
-        {diceNumbers.slice(0, 2).map((num, index) => (
-          <Dice key={index} number={num} />
+        {diceValues.slice(5, 7).map((value, index) => (
+          <Dice key={index} number={value} />
         ))}
       </StyledDiceContainer>
       <StyledDiceContainer>
-        {diceNumbers.slice(2).map((num, index) => (
-          <Dice key={index + 2} number={num} />
+        {diceValues.slice(7).map((value, index) => (
+          <Dice key={index} number={value} />
         ))}
       </StyledDiceContainer>
     </StyledContentWrapper>
