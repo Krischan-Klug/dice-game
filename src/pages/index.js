@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useState, useEffect } from "react";
 import Dice from "@/components/Dice";
+import DefaultButton from "@/components/DefaultButton";
 
 const StyledButton = styled.button`
   border: black 2px solid;
@@ -10,7 +11,7 @@ const StyledButton = styled.button`
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
-  font-size: 16px;
+  font-size: 18px;
   margin: 4px 2px;
   width: 150px;
 `;
@@ -70,7 +71,7 @@ export default function Home() {
       </StyledDiceContainer>
 
       <h1>10000 (Farkle)</h1>
-      <StyledButton onClick={() => router.push("/local")}>LOCAL</StyledButton>
+      <DefaultButton text={"LOCAL"} onClick={() => router.push("/local")} />
       <br />
       <StyledDiceContainer>
         {diceValues.slice(5, 7).map((value, index) => (
