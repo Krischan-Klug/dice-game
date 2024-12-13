@@ -140,10 +140,11 @@ const StyledLeaderboardContainer = styled.div`
   align-items: center;
   justify-content: center;
   margin: 20px;
+  margin-bottom: 15vh;
   border: 2px solid black;
   border-radius: 10px;
   padding: 10px;
-  height: 20vh;
+  height: 150px;
   width: 80vw;
   overflow-y: auto;
 `;

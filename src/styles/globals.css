@@ -6,15 +6,12 @@
 
 body {
   font-family: "SFPRO", sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 button,
 input,
 textarea {
   font-family: "SFPRO", sans-serif;
-}
-
-html {
-  margin: 0;
-  padding: 0;
 }
